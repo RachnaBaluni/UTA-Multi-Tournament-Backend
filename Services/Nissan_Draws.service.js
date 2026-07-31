@@ -263,12 +263,17 @@ exports.swapMatchup = async (
     const sourceMatch = await Nissan_Draws.findById(sourceMatchId);
     const targetMatch = await Nissan_Draws.findById(targetMatchId);
 
-    if (
-      sourceMatch.Status === "Completed" ||
-      sourceMatch.Winner ||
-      targetMatch.Status === "Completed" ||
-      targetMatch.Winner
-    ) {
+    const sourceIsRealCompleted =
+      sourceMatch.Status === "Completed" &&
+      sourceMatch.Team1 &&
+      sourceMatch.Team2;
+
+    const targetIsRealCompleted =
+      targetMatch.Status === "Completed" &&
+      targetMatch.Team1 &&
+      targetMatch.Team2;
+
+    if (sourceIsRealCompleted || targetIsRealCompleted) {
       throw new Error(
         "This match has already been completed. Drag and drop is not allowed.",
       );
