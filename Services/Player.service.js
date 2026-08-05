@@ -4,7 +4,7 @@ const Event = require("../models/Event.model.js");
 const Nissan_Draws = require("../models/Nissan_Draws.model.js");
 
 const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
-const FOOD_PREFS = ["Veg", "Non-Veg"];
+const FOOD_PREFS = ["Veg", "Non-Veg", "I Won't be There"];
 
 const RegisterPlayer = async (data) => {
   const requiredFields = [
