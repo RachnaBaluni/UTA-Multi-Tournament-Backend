@@ -66,6 +66,9 @@ const RegisterPlayer = async (data) => {
     throw new Error("Short Size Option is not correct.");
   }
 
+  console.log("Food Pref Received:", playerData.foodPref);
+  console.log("Allowed Food Prefs:", FOOD_PREFS);
+
   if (!FOOD_PREFS.includes(playerData.foodPref)) {
     throw new Error("Incorrect Food Preference.");
   }
