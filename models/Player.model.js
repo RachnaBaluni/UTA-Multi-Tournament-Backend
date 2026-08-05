@@ -31,7 +31,7 @@ const playerSchema = new mongoose.Schema(
     },
     foodPref: {
       type: String,
-      enum: ["Veg", "Non-Veg", "I Won't be There"],
+      enum: ["Veg", "Non-Veg", "I Won't Be There"],
     },
     stay: {
       type: Boolean,
