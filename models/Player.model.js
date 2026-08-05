@@ -31,7 +31,7 @@ const playerSchema = new mongoose.Schema(
     },
     foodPref: {
       type: String,
-      enum: ["Veg", "Non-Veg"],
+      enum: ["Veg", "Non-Veg", "I Won't be There"],
     },
     stay: {
       type: Boolean,
@@ -53,7 +53,7 @@ const playerSchema = new mongoose.Schema(
       default: "",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Player = mongoose.model("Player", playerSchema);
