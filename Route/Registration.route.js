@@ -2,7 +2,7 @@ const express = require("express");
 const {
   getRegistrationFields,
   updateRegistrationFields,
-} = require("../Controllers/Registration.controller");
+} = require("../Controllers/Registration.Controller");
 
 const { isAdmin } = require("../MiddleWare/authMiddleware");
 
