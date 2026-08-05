@@ -85,4 +85,44 @@ const deleteEvent = async (req, res) => {
   }
 };
 
-module.exports = { getAllEvents, createEvent, updateEvent, deleteEvent };
+const getRegistrationFields = async (req, res) => {
+  try {
+    const fields = await eventService.getRegistrationFieldsService();
+
+    res.status(200).json({
+      success: true,
+      data: fields,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const updateRegistrationFields = async (req, res) => {
+  try {
+    const fields = await eventService.updateRegistrationFieldsService(req.body);
+
+    res.status(200).json({
+      success: true,
+      data: fields,
+      message: "Registration fields updated successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+module.exports = {
+  getAllEvents,
+  createEvent,
+  updateEvent,
+  deleteEvent,
+  getRegistrationFields,
+  updateRegistrationFields,
+};

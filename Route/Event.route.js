@@ -4,6 +4,8 @@ const {
   createEvent,
   updateEvent,
   deleteEvent,
+  getRegistrationFields,
+  updateRegistrationFields,
 } = require("../Controllers/Events.controller.js");
 const { isAdmin } = require("../MiddleWare/authMiddleware");
 
@@ -13,5 +15,7 @@ router.get("/", getAllEvents);
 router.post("/", isAdmin, createEvent);
 router.put("/:id", isAdmin, updateEvent);
 router.delete("/:id", isAdmin, deleteEvent);
+router.get("/registration-fields", getRegistrationFields);
+router.put("/registration-fields", isAdmin, updateRegistrationFields);
 
 module.exports = router;

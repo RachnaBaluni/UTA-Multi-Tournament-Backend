@@ -46,6 +46,8 @@ app.use("/api/team/", require("./Route/Team.route.js"));
 app.use("/api/nissan-draws/", require("./Route/Nissan_Draws.route.js"));
 app.use("/api", require("./Route/OrderOfPlay"));
 app.use("/api/academies/", require("./Route/Academy.route.js"));
+app.use("/api/registration-fields/", require("./Route/Registration.route.js"));
+
 const PORT = process.env.PORT || 3002;
 
 // Start Server
