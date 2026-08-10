@@ -74,7 +74,45 @@ const getOrderOfPlay = async (req, res) => {
     });
   }
 };
+
+// ---------------- DELETE DAY ----------------
+const deleteOrderOfPlay = async (req, res) => {
+  try {
+    const { eventId, playDate } = req.params;
+
+    console.log("DELETE ORDER OF PLAY", {
+      eventId,
+      playDate,
+    });
+
+    const deleted = await OrderOfPlay.findOneAndDelete({
+      eventId,
+      playDate,
+    });
+
+    if (!deleted) {
+      return res.status(404).json({
+        success: false,
+        message: "Order of play for this day not found",
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Day deleted successfully",
+      data: deleted,
+    });
+  } catch (err) {
+    console.error("DELETE ORDER OF PLAY ERROR:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
 module.exports = {
   saveOrderOfPlay,
   getOrderOfPlay,
+  deleteOrderOfPlay,
 };
