@@ -2,7 +2,8 @@ const tournamentService = require("../Services/Tournament.service");
 
 const getAllTournaments = async (req, res) => {
   try {
-    const tournaments = await tournamentService.getAllTournamentsService();
+    const tournaments =
+      await tournamentService.getAllTournamentsService(tournamentId);
 
     res.status(200).json({
       success: true,

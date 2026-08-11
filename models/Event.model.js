@@ -2,6 +2,12 @@ const mongoose = require("mongoose");
 
 const eventSchema = new mongoose.Schema(
   {
+    tournamentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tournament",
+      required: true,
+    },
+
     name: {
       type: String,
       required: true,

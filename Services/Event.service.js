@@ -1,13 +1,12 @@
 const Event = require("../models/Event.model");
 
-exports.getAllEventsService = async () => {
+exports.getAllEventsService = async (tournamentId) => {
   try {
-    return await Event.find().sort({ date: "desc" });
+    return await Event.find({ tournamentId }).sort({ date: "desc" });
   } catch (error) {
     throw new Error(error.message);
   }
 };
-
 exports.createEventService = async (eventData) => {
   try {
     const newEvent = new Event(eventData);
