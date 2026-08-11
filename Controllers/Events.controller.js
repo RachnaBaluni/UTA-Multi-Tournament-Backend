@@ -2,8 +2,14 @@ const eventService = require("../Services/Event.service");
 const Team = require("../models/Team.model");
 const getAllEvents = async (req, res) => {
   try {
-    const events = await eventService.getAllEventsService();
-    res.status(200).json({ success: true, data: events });
+    const { tournamentId } = req.query;
+
+    const events = await eventService.getAllEventsService(tournamentId);
+
+    res.status(200).json({
+      success: true,
+      data: events,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -12,7 +18,6 @@ const getAllEvents = async (req, res) => {
     });
   }
 };
-
 const createEvent = async (req, res) => {
   try {
     const newEvent = await eventService.createEventService(req.body);
