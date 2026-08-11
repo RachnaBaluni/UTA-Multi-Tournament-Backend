@@ -12,12 +12,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS
 const allowedOrigins = [
-  "https://frontend1-liart-theta.vercel.app",
-  "https://admin-beta-gules.vercel.app",
+  "https://uta-multi-tournament-frontend-eoss.vercel.app",
+  "https://uta-multi-tournament-admin.vercel.app",
   "http://localhost:5173",
   "http://localhost:3000",
 ];
-
 app.use(
   cors({
     origin: function (origin, callback) {
