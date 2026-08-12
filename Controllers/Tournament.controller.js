@@ -2,14 +2,15 @@ const tournamentService = require("../Services/Tournament.service");
 
 const getAllTournaments = async (req, res) => {
   try {
-    const tournaments =
-      await tournamentService.getAllTournamentsService(tournamentId);
+    const tournaments = await tournamentService.getAllTournamentsService();
 
     res.status(200).json({
       success: true,
       data: tournaments,
     });
   } catch (error) {
+    console.error("GET ALL TOURNAMENTS ERROR:", error);
+
     res.status(500).json({
       success: false,
       message: "Error fetching tournaments.",
