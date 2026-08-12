@@ -1,6 +1,6 @@
 const Event = require("../models/Event.model");
 
-eexports.getAllEventsService = async (tournamentId) => {
+exports.getAllEventsService = async (tournamentId) => {
   try {
     const filter = {};
 
