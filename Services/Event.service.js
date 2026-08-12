@@ -1,8 +1,14 @@
 const Event = require("../models/Event.model");
 
-exports.getAllEventsService = async (tournamentId) => {
+eexports.getAllEventsService = async (tournamentId) => {
   try {
-    return await Event.find({ tournamentId }).sort({ date: "desc" });
+    const filter = {};
+
+    if (tournamentId) {
+      filter.tournamentId = tournamentId;
+    }
+
+    return await Event.find(filter).sort({ date: "desc" });
   } catch (error) {
     throw new Error(error.message);
   }
