@@ -4,7 +4,7 @@ const getAllEvents = async (req, res) => {
   try {
     const { tournamentId } = req.query;
 
-    const events = await eventService.getAllEventsService(tournamentId);
+    const events = await eventService.getAllEventsService();
 
     res.status(200).json({
       success: true,
