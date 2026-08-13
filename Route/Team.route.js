@@ -8,7 +8,7 @@ const { isAdmin } = require("../MiddleWare/authMiddleware");
 
 const router = express.Router();
 
-router.get("/all", controller.getAllTeams);
+router.get("/all/:tournamentId", controller.getAllTeams);
 router.get("/unassigned", controller.getUnassignedTeams);
 router.get("/:id", controller.getPlayerTeams);
 router.put("/update-ranking", isAdmin, controller.updateTeamRanking);

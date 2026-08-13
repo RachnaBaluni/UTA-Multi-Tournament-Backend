@@ -1,5 +1,7 @@
 const Team = require("../models/Team.model");
 const Nissan_Draws = require("../models/Nissan_Draws.model");
+const Event = require("../models/Event.model");
+
 exports.updateTeamRankingService = async (orderedTeams) => {
   try {
     // Get first team to identify the event
@@ -24,12 +26,20 @@ exports.updateTeamRankingService = async (orderedTeams) => {
   }
 };
 
-exports.getAllTeamsService = async (eventId = null) => {
+exports.getAllTeamsService = async (tournamentId = null) => {
   try {
     let query = {};
-    if (eventId) {
-      query.eventId = eventId;
+
+    if (tournamentId) {
+      // Tournament ke andar ke saare events
+      const events = await Event.find({ tournamentId }).select("_id");
+
+      const eventIds = events.map((event) => event._id);
+
+      // Is tournament ke events ki teams
+      query.eventId = { $in: eventIds };
     }
+
     const teams = await Team.find(query)
       .populate({ path: "partner1", select: "name" })
       .populate({ path: "partner2", select: "name" })
