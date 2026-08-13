@@ -895,18 +895,27 @@ const getPlayersWithDetails = async () => {
   return players;
 };
 
-const getPlayersWithDetailsFrontend = async () => {
-  // 1. Fetch all players
-  const players = await Player.find({}).lean();
+const getPlayersWithDetailsFrontend = async (tournamentId) => {
+  // 1. Get all events of selected tournament
+  const events = await Event.find({ tournamentId }).select("_id").lean();
 
-  // 2. Fetch all teams ONCE (not inside loop)
-  const teams = await Team.find({})
+  const eventIds = events.map((event) => event._id);
+
+  // If tournament has no events
+  if (eventIds.length === 0) {
+    return [];
+  }
+
+  // 2. Get only teams belonging to this tournament
+  const teams = await Team.find({
+    eventId: { $in: eventIds },
+  })
     .populate("eventId", "name")
     .populate("partner1", "name")
     .populate("partner2", "name")
     .lean();
 
-  // 3. Build a map: playerId -> list of teams they are part of
+  // 3. Build player -> teams map
   const teamsByPlayer = {};
 
   for (const team of teams) {
@@ -916,12 +925,23 @@ const getPlayersWithDetailsFrontend = async () => {
       if (!pid) continue;
 
       const key = pid.toString();
-      if (!teamsByPlayer[key]) teamsByPlayer[key] = [];
+
+      if (!teamsByPlayer[key]) {
+        teamsByPlayer[key] = [];
+      }
+
       teamsByPlayer[key].push(team);
     }
   }
 
-  // 4. Build the final players list
+  // 4. Get ONLY players who are registered in this tournament
+  const playerIds = Object.keys(teamsByPlayer);
+
+  const players = await Player.find({
+    _id: { $in: playerIds },
+  }).lean();
+
+  // 5. Build final player list
   const finalPlayersList = [];
 
   for (const player of players) {
@@ -935,6 +955,7 @@ const getPlayersWithDetailsFrontend = async () => {
 
     if (playerTeams[0]) {
       const t = playerTeams[0];
+
       event1 = t.eventId?.name;
 
       event1Partner =
@@ -945,6 +966,7 @@ const getPlayersWithDetailsFrontend = async () => {
 
     if (playerTeams[1]) {
       const t = playerTeams[1];
+
       event2 = t.eventId?.name;
 
       event2Partner =
@@ -952,26 +974,14 @@ const getPlayersWithDetailsFrontend = async () => {
           ? t.partner2?.name || "N/A"
           : t.partner1?.name || "N/A";
     }
-    /*
-    finalPlayersList.push({
-      name: player.name,
-      event1,
-      event1Partner,
-      event2,
-      event2Partner,
-      whatsappNumber: player.whatsappNumber,
-      //dob: "This is Working",
-      dob: player.dob ? String(new Date(player.dob).getFullYear()) : null, // Only Year
-      city: player.city,
-    });
-    */
+
     finalPlayersList.push({
       _id: player._id,
-
       name: player.name,
 
       event1,
       event1Partner,
+
       event2,
       event2Partner,
 

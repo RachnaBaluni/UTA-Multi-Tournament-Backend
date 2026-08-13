@@ -1,11 +1,8 @@
-
 const jwt = require("jsonwebtoken");
-
 
 const PlayerService = require("../Services/Player.service.js");
 const Team = require("../models/Team.model.js");
 const Player = require("../models/Player.model.js");
-
 
 const getPlayers = async (req, res) => {
   try {
@@ -44,27 +41,25 @@ const RegisterPlayer = async (req, res) => {
 const loginPlayer = async (req, res) => {
   try {
     const data = await PlayerService.loginPlayer(req.body);
-    const token = jwt.sign(
-      { id: data._id },
-      "secretkey123",   
-      { expiresIn: "7d" }
-    );
-
+    const token = jwt.sign({ id: data._id }, "secretkey123", {
+      expiresIn: "7d",
+    });
 
     res.status(200).json({
       success: true,
       message: `Welcome ${data.name}`,
       data: data,
-      token:token,
+      token: token,
     });
   } catch (error) {
-  console.log("LOGIN ERROR 👉", error); // 
+    console.log("LOGIN ERROR 👉", error); //
 
-  res.status(500).json({
-    success: false,
-    message: error.message,
-  });
-}}
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 const getLoggedInPlayer = async (req, res) => {
   try {
@@ -129,7 +124,9 @@ const getPlayersWithDetails = async (req, res) => {
 };
 const getPlayersWithDetailsFrontend = async (req, res) => {
   try {
-    const players = await PlayerService.getPlayersWithDetailsFrontend();
+    const players = await PlayerService.getPlayersWithDetailsFrontend(
+      req.params.tournamentId,
+    );
     res.status(200).json({
       success: true,
       message: "Fetched Players Successfully",
@@ -162,7 +159,7 @@ const toggleFeeStatus = async (req, res) => {
 const deletePlayer = async (req, res) => {
   try {
     const result = await PlayerService.deletePlayerAndHandleTeams(
-      req.params.id
+      req.params.id,
     );
     res.status(200).json({
       success: true,
