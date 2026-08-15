@@ -10,7 +10,10 @@ router.get(
   isAdmin,
   PlayerController.getPlayersWithDetailsFrontend,
 ); //router.get("/details", isAdmin, PlayerController.getPlayersWithDetails);
-router.get("/details-frontend", PlayerController.getPlayersWithDetailsFrontend);
+router.get(
+  "/details-frontend/:tournamentId",
+  PlayerController.getPlayersWithDetailsFrontend,
+);
 router.post("/register/", PlayerController.RegisterPlayer);
 router.post("/login", PlayerController.loginPlayer);
 router.get("/:id", PlayerController.getLoggedInPlayer);
