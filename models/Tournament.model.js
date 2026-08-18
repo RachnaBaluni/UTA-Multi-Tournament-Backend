@@ -18,6 +18,18 @@ const tournamentSchema = new mongoose.Schema(
       required: true,
     },
 
+    director: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    directorPhone: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
     status: {
       type: String,
       enum: ["Upcoming", "Active", "Completed"],
