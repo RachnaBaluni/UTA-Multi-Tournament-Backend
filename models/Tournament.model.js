@@ -35,6 +35,29 @@ const tournamentSchema = new mongoose.Schema(
       enum: ["Upcoming", "Active", "Completed"],
       default: "Upcoming",
     },
+    registrationFields: {
+      shirtSize: {
+        type: Boolean,
+        default: false,
+      },
+
+      foodPreference: {
+        type: Boolean,
+        default: false,
+      },
+      accommodation: {
+        type: Boolean,
+        default: false,
+      },
+      feePaid: {
+        type: Boolean,
+        default: false,
+      },
+      transactionDetails: {
+        type: Boolean,
+        default: false,
+      },
+    },
   },
   {
     timestamps: true,
