@@ -2,6 +2,7 @@ const Player = require("../models/Player.model.js");
 const Team = require("../models/Team.model.js");
 const Event = require("../models/Event.model.js");
 const Nissan_Draws = require("../models/Nissan_Draws.model.js");
+const Tournament = require("../models/Tournament.model.js");
 
 const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const FOOD_PREFS = ["Veg", "Non-Veg", "I Won't Be There"];
@@ -23,21 +24,32 @@ const RegisterPlayer = async (data) => {
     throw new Error("Invalid Id for Event 1.");
   }
 
-  const registrationFields = Event1.registrationFields || {};
+  const Tournament1 = await Tournament.findById(Event1.tournamentId);
+
+  if (!Tournament1) {
+    throw new Error("Invalid Tournament.");
+  }
+
+  const registrationFields = Tournament1.registrationFields || {};
 
   console.log("🔥 BACKEND REGISTRATION FIELDS:", registrationFields);
-  const requiredFields = [
-    "name",
-    "whatsappNumber",
-    "dob",
-    "city",
-    "shirtSize",
-    "shortSize",
-    "foodPref",
-    "feePaid",
-    "stay",
-  ];
+  const requiredFields = ["name", "whatsappNumber", "dob", "city"];
 
+  if (registrationFields.shirtSize) {
+    requiredFields.push("shirtSize", "shortSize");
+  }
+
+  if (registrationFields.foodPreference) {
+    requiredFields.push("foodPref");
+  }
+
+  if (registrationFields.feePaid) {
+    requiredFields.push("feePaid");
+  }
+
+  if (registrationFields.accommodation) {
+    requiredFields.push("stay");
+  }
   for (const field of requiredFields) {
     if (
       !data.hasOwnProperty(field) ||
@@ -77,19 +89,23 @@ const RegisterPlayer = async (data) => {
     throw new Error("Date Of Birth is not correct (cannot be in the future).");
   }
 
-  if (!SHIRT_SIZES.includes(playerData.shirtSize)) {
-    throw new Error("Shirt Size Option is not correct.");
-  }
+  if (registrationFields.shirtSize) {
+    if (!SHIRT_SIZES.includes(playerData.shirtSize)) {
+      throw new Error("Shirt Size Option is not correct.");
+    }
 
-  if (!SHIRT_SIZES.includes(playerData.shortSize)) {
-    throw new Error("Short Size Option is not correct.");
+    if (!SHIRT_SIZES.includes(playerData.shortSize)) {
+      throw new Error("Short Size Option is not correct.");
+    }
   }
 
   console.log("Food Pref Received:", playerData.foodPref);
   console.log("Allowed Food Prefs:", FOOD_PREFS);
 
-  if (!FOOD_PREFS.includes(playerData.foodPref)) {
-    throw new Error("Incorrect Food Preference.");
+  if (registrationFields.foodPreference) {
+    if (!FOOD_PREFS.includes(playerData.foodPref)) {
+      throw new Error("Incorrect Food Preference.");
+    }
   }
 
   const duplicatePlayer = await Player.findOne({
@@ -266,11 +282,13 @@ const updatePlayer = async (id, data) => {
     feePaid: data.feePaid,
     transactionDetails: data.feePaid ? data.transactionDetails : "",
   };
-
-  if (playerData.feePaid && !playerData.transactionDetails) {
+  if (
+    registrationFields.feePaid &&
+    playerData.feePaid &&
+    !playerData.transactionDetails?.trim()
+  ) {
     throw new Error("Transaction details are required if fee is paid.");
   }
-
   const phoneRegex = new RegExp("^[6-9]\\d{9}$");
   if (!phoneRegex.test(playerData.whatsappNumber.toString())) {
     throw new Error("Phone Number is not correct.");
