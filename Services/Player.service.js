@@ -99,19 +99,12 @@ const RegisterPlayer = async (data) => {
     throw new Error("The Whatsapp Number is already Registered.");
   }
 
-  const { event1, event2, partner1, partner2 } = data;
-
   if (!event1 || typeof event1 !== "string" || !event1.trim()) {
     throw new Error("Event 1 cannot be empty.");
   }
 
   if (event2 && event2 === event1) {
     throw new Error("Event 1 and Event 2 cannot be the same.");
-  }
-
-  const Event1 = await Event.findById(event1);
-  if (!Event1) {
-    throw new Error("Invalid Id for Event 1.");
   }
 
   let Event2 = null;
