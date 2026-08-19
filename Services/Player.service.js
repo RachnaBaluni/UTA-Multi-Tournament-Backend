@@ -10,6 +10,22 @@ const RegisterPlayer = async (data) => {
   console.log("🔥 REGISTER BODY:", JSON.stringify(data, null, 2));
   console.log("🔥 SHIRT SIZE:", data.shirtSize);
   console.log("🔥 SHORT SIZE:", data.shortSize);
+
+  const { event1, event2, partner1, partner2 } = data;
+
+  if (!event1 || typeof event1 !== "string" || !event1.trim()) {
+    throw new Error("Event 1 cannot be empty.");
+  }
+
+  const Event1 = await Event.findById(event1);
+
+  if (!Event1) {
+    throw new Error("Invalid Id for Event 1.");
+  }
+
+  const registrationFields = Event1.registrationFields || {};
+
+  console.log("🔥 BACKEND REGISTRATION FIELDS:", registrationFields);
   const requiredFields = [
     "name",
     "whatsappNumber",
@@ -61,13 +77,13 @@ const RegisterPlayer = async (data) => {
     throw new Error("Date Of Birth is not correct (cannot be in the future).");
   }
 
-  // if (!SHIRT_SIZES.includes(playerData.shirtSize)) {
-  //   throw new Error("Shirt Size Option is not correct.");
-  // }
+  if (!SHIRT_SIZES.includes(playerData.shirtSize)) {
+    throw new Error("Shirt Size Option is not correct.");
+  }
 
-  // if (!SHIRT_SIZES.includes(playerData.shortSize)) {
-  //   throw new Error("Short Size Option is not correct.");
-  // }
+  if (!SHIRT_SIZES.includes(playerData.shortSize)) {
+    throw new Error("Short Size Option is not correct.");
+  }
 
   console.log("Food Pref Received:", playerData.foodPref);
   console.log("Allowed Food Prefs:", FOOD_PREFS);
