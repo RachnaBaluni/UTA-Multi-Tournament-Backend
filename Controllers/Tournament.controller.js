@@ -19,6 +19,34 @@ const getAllTournaments = async (req, res) => {
   }
 };
 
+const getTournamentById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const tournament = await tournamentService.getTournamentByIdService(id);
+
+    if (!tournament) {
+      return res.status(404).json({
+        success: false,
+        message: "Tournament not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: tournament,
+    });
+  } catch (error) {
+    console.error("GET TOURNAMENT BY ID ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Error fetching tournament.",
+      error: error.message,
+    });
+  }
+};
+
 const createTournament = async (req, res) => {
   try {
     const newTournament = await tournamentService.createTournamentService(
@@ -101,4 +129,5 @@ module.exports = {
   createTournament,
   updateTournament,
   deleteTournament,
+  getTournamentById,
 };

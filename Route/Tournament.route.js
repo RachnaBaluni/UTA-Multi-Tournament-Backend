@@ -2,6 +2,7 @@ const express = require("express");
 
 const {
   getAllTournaments,
+  getTournamentById,
   createTournament,
   updateTournament,
   deleteTournament,
@@ -15,5 +16,5 @@ router.get("/", getAllTournaments);
 router.post("/", isAdmin, createTournament);
 router.put("/:id", isAdmin, updateTournament);
 router.delete("/:id", isAdmin, deleteTournament);
-
+router.get("/:id", getTournamentById);
 module.exports = router;

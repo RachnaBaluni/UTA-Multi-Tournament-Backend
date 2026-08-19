@@ -7,7 +7,13 @@ exports.getAllTournamentsService = async () => {
     throw new Error(error.message);
   }
 };
-
+exports.getTournamentByIdService = async (tournamentId) => {
+  try {
+    return await Tournament.findById(tournamentId);
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
 exports.createTournamentService = async (tournamentData) => {
   try {
     const newTournament = new Tournament(tournamentData);
