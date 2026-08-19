@@ -22,12 +22,12 @@ const playerSchema = new mongoose.Schema(
     shirtSize: {
       type: String,
       enum: ["XS", "S", "M", "L", "XL", "XXL"],
-      required: true,
+      required: false,
     },
     shortSize: {
       type: String,
       enum: ["XS", "S", "M", "L", "XL", "XXL"],
-      required: true,
+      required: false,
     },
     foodPref: {
       type: String,
