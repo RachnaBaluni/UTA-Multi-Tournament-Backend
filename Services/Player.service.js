@@ -7,6 +7,9 @@ const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const FOOD_PREFS = ["Veg", "Non-Veg", "I Won't Be There"];
 
 const RegisterPlayer = async (data) => {
+  console.log("🔥 REGISTER BODY:", JSON.stringify(data, null, 2));
+  console.log("🔥 SHIRT SIZE:", data.shirtSize);
+  console.log("🔥 SHORT SIZE:", data.shortSize);
   const requiredFields = [
     "name",
     "whatsappNumber",
@@ -58,13 +61,13 @@ const RegisterPlayer = async (data) => {
     throw new Error("Date Of Birth is not correct (cannot be in the future).");
   }
 
-  if (!SHIRT_SIZES.includes(playerData.shirtSize)) {
-    throw new Error("Shirt Size Option is not correct.");
-  }
+  // if (!SHIRT_SIZES.includes(playerData.shirtSize)) {
+  //   throw new Error("Shirt Size Option is not correct.");
+  // }
 
-  if (!SHIRT_SIZES.includes(playerData.shortSize)) {
-    throw new Error("Short Size Option is not correct.");
-  }
+  // if (!SHIRT_SIZES.includes(playerData.shortSize)) {
+  //   throw new Error("Short Size Option is not correct.");
+  // }
 
   console.log("Food Pref Received:", playerData.foodPref);
   console.log("Allowed Food Prefs:", FOOD_PREFS);
