@@ -8,6 +8,9 @@ const SHIRT_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 const FOOD_PREFS = ["Veg", "Non-Veg", "I Won't Be There"];
 
 const RegisterPlayer = async (data) => {
+  console.log("🔥 PLAYER MODEL:", Player);
+  console.log("🔥 PLAYER FINDONE:", typeof Player.findOne);
+  console.log("🔥 PLAYER CREATE:", typeof Player.create);
   console.log("🔥 REGISTER BODY:", JSON.stringify(data, null, 2));
   console.log("🔥 SHIRT SIZE:", data.shirtSize);
   console.log("🔥 SHORT SIZE:", data.shortSize);
