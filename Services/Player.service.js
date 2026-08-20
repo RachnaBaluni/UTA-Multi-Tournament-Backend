@@ -258,8 +258,13 @@ const loginPlayer = async (data) => {
 
 const updatePlayer = async (id, data) => {
   const player = await Player.findById(id);
-  if (!player) throw new Error("Incorrect Player Id Provided");
-  // --- Player Data Validation ---
+
+  if (!player) {
+    throw new Error("Incorrect Player Id Provided");
+  }
+
+  console.log("🔥 UPDATE PLAYER DATA:", JSON.stringify(data, null, 2));
+
   const requiredFields = [
     "name",
     "whatsappNumber",
@@ -274,7 +279,7 @@ const updatePlayer = async (id, data) => {
 
   for (const field of requiredFields) {
     if (
-      !data.hasOwnProperty(field) ||
+      !Object.prototype.hasOwnProperty.call(data, field) ||
       data[field] === undefined ||
       data[field] === null
     ) {
@@ -284,48 +289,46 @@ const updatePlayer = async (id, data) => {
     }
   }
 
-  const playerData = {
-    name: data.name,
-    whatsappNumber: data.whatsappNumber,
-    dob: data.dob,
-    city: data.city,
-    shirtSize: data.shirtSize,
-    shortSize: data.shortSize,
-    foodPref: data.foodPref,
-    stay: data.stay,
-    feePaid: data.feePaid,
-    transactionDetails: data.feePaid ? data.transactionDetails : "",
-  };
-  if (
-    registrationFields.feePaid &&
-    playerData.feePaid &&
-    !playerData.transactionDetails?.trim()
-  ) {
-    throw new Error("Transaction details are required if fee is paid.");
-  }
-  const phoneRegex = new RegExp("^[6-9]\\d{9}$");
-  if (!phoneRegex.test(playerData.whatsappNumber.toString())) {
+  const phoneRegex = /^[6-9]\d{9}$/;
+
+  if (!phoneRegex.test(data.whatsappNumber.toString())) {
     throw new Error("Phone Number is not correct.");
   }
 
-  if (new Date(playerData.dob) > new Date()) {
+  if (new Date(data.dob) > new Date()) {
     throw new Error("Date Of Birth is not correct.");
   }
 
-  if (!SHIRT_SIZES.includes(playerData.shirtSize)) {
+  if (!SHIRT_SIZES.includes(data.shirtSize)) {
     throw new Error("Shirt Size Option is not correct.");
   }
 
-  if (!SHIRT_SIZES.includes(playerData.shortSize)) {
+  if (!SHIRT_SIZES.includes(data.shortSize)) {
     throw new Error("Short Size Option is not correct.");
   }
 
-  if (!FOOD_PREFS.includes(playerData.foodPref)) {
+  if (!FOOD_PREFS.includes(data.foodPref)) {
     throw new Error("Incorrect Food Preference.");
   }
 
-  Object.assign(player, playerData);
+  if (data.feePaid && !data.transactionDetails?.trim()) {
+    throw new Error("Transaction details are required if fee is paid.");
+  }
+
+  player.name = data.name;
+  player.whatsappNumber = data.whatsappNumber;
+  player.dob = data.dob;
+  player.city = data.city;
+  player.shirtSize = data.shirtSize;
+  player.shortSize = data.shortSize;
+  player.foodPref = data.foodPref;
+  player.stay = data.stay;
+  player.feePaid = data.feePaid;
+  player.transactionDetails = data.feePaid ? data.transactionDetails : "";
+
   await player.save();
+
+  return player;
 };
 
 // const updateTeams = async (id, data) => {
