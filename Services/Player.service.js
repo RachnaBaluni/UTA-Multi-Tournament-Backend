@@ -71,18 +71,33 @@ const RegisterPlayer = async (data) => {
     whatsappNumber: data.whatsappNumber,
     dob: data.dob,
     city: data.city,
-    shirtSize: data.shirtSize,
-    shortSize: data.shortSize,
-    foodPref: data.foodPref,
-    stay: data.stay,
-    feePaid: data.feePaid,
-    transactionDetails: data.feePaid ? data.transactionDetails : "",
+
+    ...(registrationFields.shirtSize && {
+      shirtSize: data.shirtSize,
+      shortSize: data.shortSize,
+    }),
+
+    ...(registrationFields.foodPreference && {
+      foodPref: data.foodPref,
+    }),
+
+    ...(registrationFields.accommodation && {
+      stay: data.stay,
+    }),
+
+    ...(registrationFields.feePaid && {
+      feePaid: data.feePaid,
+      transactionDetails: data.feePaid ? data.transactionDetails : "",
+    }),
   };
 
-  if (playerData.feePaid && !playerData.transactionDetails.trim()) {
+  if (
+    registrationFields.feePaid &&
+    playerData.feePaid &&
+    !playerData.transactionDetails?.trim()
+  ) {
     throw new Error("Transaction details are required if fee is paid.");
   }
-
   const phoneRegex = new RegExp("^[6-9]\\d{9}$");
   if (!phoneRegex.test(playerData.whatsappNumber.toString())) {
     throw new Error("Phone Number is not correct.");
