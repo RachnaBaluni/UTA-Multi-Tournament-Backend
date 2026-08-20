@@ -91,11 +91,7 @@ const RegisterPlayer = async (data) => {
     }),
   };
 
-  if (
-    registrationFields.feePaid &&
-    playerData.feePaid &&
-    !playerData.transactionDetails?.trim()
-  ) {
+  if (playerData.feePaid && !playerData.transactionDetails?.trim()) {
     throw new Error("Transaction details are required if fee is paid.");
   }
   const phoneRegex = new RegExp("^[6-9]\\d{9}$");
