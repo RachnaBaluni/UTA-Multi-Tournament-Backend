@@ -40,19 +40,31 @@ const RegisterPlayer = async (req, res) => {
 
 const loginPlayer = async (req, res) => {
   try {
-    const data = await PlayerService.loginPlayer(req.body);
-    const token = jwt.sign({ id: data._id }, "secretkey123", {
+    const { type, identifier, password } = req.body;
+
+    let data;
+
+    if (type === "Player") {
+      data = await PlayerService.loginPlayer({
+        whatsappNumber: identifier,
+        dob: password,
+      });
+    } else {
+      data = await PlayerService.loginPlayer(req.body);
+    }
+
+    const token = jwt.sign({ id: data.id }, "secretkey123", {
       expiresIn: "7d",
     });
 
     res.status(200).json({
       success: true,
       message: `Welcome ${data.name}`,
-      data: data,
-      token: token,
+      user: data,
+      token,
     });
   } catch (error) {
-    console.log("LOGIN ERROR 👉", error); //
+    console.log("LOGIN ERROR 👉", error);
 
     res.status(500).json({
       success: false,
