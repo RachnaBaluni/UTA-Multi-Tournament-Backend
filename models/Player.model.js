@@ -35,11 +35,12 @@ const playerSchema = new mongoose.Schema(
     },
     stay: {
       type: Boolean,
-      required: true,
+      required: false,
+      default: false,
     },
     feePaid: {
       type: Boolean,
-      required: true,
+      required: false,
       default: false,
     },
     feePaidAdmin: {
