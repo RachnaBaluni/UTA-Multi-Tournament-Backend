@@ -105,3 +105,24 @@ exports.getUnassignedTeamsService = async (eventId) => {
     throw new Error(error.message);
   }
 };
+exports.getPlayerTeamsService = async (id) => {
+  try {
+    const teams = await Team.find({
+      $or: [{ partner1: id }, { partner2: id }],
+    })
+      .populate({ path: "partner1", select: "name" })
+      .populate({ path: "partner2", select: "name" })
+      .populate({
+        path: "eventId",
+        select: "name tournamentId",
+        populate: {
+          path: "tournamentId",
+          select: "name startDate endDate status",
+        },
+      });
+
+    return teams;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
