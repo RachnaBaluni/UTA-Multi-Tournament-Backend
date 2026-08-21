@@ -511,6 +511,12 @@ const Login = async (data) => {
     }
 
     const user = await Model.findOne(query);
+    console.log("MEMBER PLAYER LOGIN CHECK 👉", {
+      identifier,
+      userFound: !!user,
+      email: user?.email,
+      number: user?.number,
+    });
 
     if (!user) {
       const error = new Error("Invalid credentials.");
