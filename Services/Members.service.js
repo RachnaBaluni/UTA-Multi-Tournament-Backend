@@ -14,7 +14,7 @@ const Register = async (body) => {
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   // Updated regex for website to allow formats like www.example.com or example.com
   const websiteRegex =
-    /^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/[a-zA-Z0-9]+\.[^\s]{2,}|[a-zA-Z0-9]+\.[^\s]{2,})$/i;
+    /^(https?:\/\/)?(www\.)?[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})(\/.*)?$/i;
 
   // List of valid district names for validation
   const validDistricts = [
@@ -80,14 +80,14 @@ const Register = async (body) => {
 
       if (!passwordRegex.test(player.password)) {
         throw new Error(
-          "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character."
+          "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character.",
         );
       }
 
       const playerSalt = await bcrypt.genSalt(10);
       const hashedPasswordPlayer = await bcrypt.hash(
         player.password,
-        playerSalt
+        playerSalt,
       );
       player.password = hashedPasswordPlayer;
 
@@ -153,7 +153,7 @@ const Register = async (body) => {
 
       if (!passwordRegex.test(coach.password)) {
         throw new Error(
-          "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character."
+          "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character.",
         );
       }
 
@@ -195,7 +195,7 @@ const Register = async (body) => {
         !confirmAcademyPassword
       )
         throw new Error(
-          "All required fields must be filled for Academy registration"
+          "All required fields must be filled for Academy registration",
         );
 
       if (!phoneRegex.test(academy.contactNumber.toString()))
@@ -207,7 +207,7 @@ const Register = async (body) => {
       // Updated: Optional website validation to support www.website.com or website.com
       if (academy.website && !websiteRegex.test(academy.website)) {
         throw new Error(
-          "Website URL is invalid. It should be a valid URL like www.example.com or example.com"
+          "Website URL is invalid. It should be a valid URL like www.example.com or example.com",
         );
       }
 
@@ -242,14 +242,14 @@ const Register = async (body) => {
 
       if (!passwordRegex.test(academy.password)) {
         throw new Error(
-          "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character."
+          "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character.",
         );
       }
 
       const academySalt = await bcrypt.genSalt(10);
       const hashedPasswordAcademy = await bcrypt.hash(
         academy.password,
-        academySalt
+        academySalt,
       );
       academy.password = hashedPasswordAcademy;
 
@@ -302,7 +302,7 @@ const Register = async (body) => {
       // Validate district name against the allowed list
       if (!validDistricts.includes(district.districtName)) {
         throw new Error(
-          `Invalid District Name: ${district.districtName}. Must be one of the specified districts.`
+          `Invalid District Name: ${district.districtName}. Must be one of the specified districts.`,
         );
       }
 
@@ -378,14 +378,14 @@ const Register = async (body) => {
 
       if (!passwordRegex.test(district.password)) {
         throw new Error(
-          "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character."
+          "Password must be at least 8 characters long, include uppercase, lowercase, number, and special character.",
         );
       }
 
       const districtSalt = await bcrypt.genSalt(10);
       const hashedPasswordDistrict = await bcrypt.hash(
         district.password,
-        districtSalt
+        districtSalt,
       );
       district.password = hashedPasswordDistrict;
 
@@ -408,7 +408,7 @@ const Login = async (data) => {
   // Basic validation
   if (!type || !identifier || !password) {
     const error = new Error(
-      "Login type, identifier (email/phone), and password are required."
+      "Login type, identifier (email/phone), and password are required.",
     );
     error.statusCode = 400; // Custom property to indicate HTTP status in controller
     throw error;
@@ -443,7 +443,7 @@ const Login = async (data) => {
         break;
       default:
         const error = new Error(
-          "Invalid login type provided. Please select Player, Coach, Academy, or District."
+          "Invalid login type provided. Please select Player, Coach, Academy, or District.",
         );
         error.statusCode = 400;
         throw error;
@@ -451,7 +451,7 @@ const Login = async (data) => {
 
     if (!Model) {
       const error = new Error(
-        "Server configuration error: No model found for the specified login type."
+        "Server configuration error: No model found for the specified login type.",
       );
       error.statusCode = 500;
       throw error;
@@ -490,7 +490,7 @@ const Login = async (data) => {
         identifier: user[queryField1] || user[queryField2],
       },
       process.env.JWT_SECRET, // Ensure JWT_SECRET is available in your env
-      { expiresIn: "1d" } // Token expires in 1 day
+      { expiresIn: "1d" }, // Token expires in 1 day
     );
 
     // Login successful
@@ -512,7 +512,7 @@ const Login = async (data) => {
     }
     // For unexpected errors, throw a generic server error
     const genericError = new Error(
-      "An internal server error occurred during login."
+      "An internal server error occurred during login.",
     );
     genericError.statusCode = 500;
     throw genericError;
@@ -567,113 +567,124 @@ const getMemberDetails = async (id, type) => {
 };
 
 const getAllMembers = async () => {
-    const players = await Player.find();
-    const coaches = await Coach.find();
-    const academies = await Academy.find();
-    const districts = await District.find();
-    return { players, coaches, academies, districts };
+  const players = await Player.find();
+  const coaches = await Coach.find();
+  const academies = await Academy.find();
+  const districts = await District.find();
+  return { players, coaches, academies, districts };
 };
 
 const approveMember = async (memberId, memberType) => {
-    let Model;
-    switch (memberType) {
-        case 'Player':
-            Model = Player;
-            break;
-        case 'Coach':
-            Model = Coach;
-            break;
-        case 'Academy':
-            Model = Academy;
-            break;
-        case 'District':
-            Model = District;
-            break;
-        default:
-            throw new Error('Invalid member type');
-    }
+  let Model;
+  switch (memberType) {
+    case "Player":
+      Model = Player;
+      identifierField = "email"; // Or "number"
+      break;
+    case "Coach":
+      Model = Coach;
+      break;
+    case "Academy":
+      Model = Academy;
+      break;
+    case "District":
+      Model = District;
+      break;
+    default:
+      throw new Error("Invalid member type");
+  }
 
-    const member = await Model.findByIdAndUpdate(
-        memberId,
-        { status: 'Verified' },
-        { new: true }
-    );
+  const member = await Model.findByIdAndUpdate(
+    memberId,
+    { status: "Verified" },
+    { new: true },
+  );
 
-    if (!member) {
-        throw new Error('Member not found');
-    }
+  if (!member) {
+    throw new Error("Member not found");
+  }
 
-    return member;
+  return member;
 };
 
 const getPendingMembers = async () => {
-    const players = await Player.find({ status: { $ne: 'Verified' } });
-    const coaches = await Coach.find({ status: { $ne: 'Verified' } });
-    const academies = await Academy.find({ status: { $ne: 'Verified' } });
-    const districts = await District.find({ status: { $ne: 'Verified' } });
-    return { players, coaches, academies, districts };
+  const players = await Player.find({ status: { $ne: "Verified" } });
+  const coaches = await Coach.find({ status: { $ne: "Verified" } });
+  const academies = await Academy.find({ status: { $ne: "Verified" } });
+  const districts = await District.find({ status: { $ne: "Verified" } });
+  return { players, coaches, academies, districts };
 };
 
 const getVerifiedMembers = async () => {
-    const players = await Player.find({ status: 'Verified' });
-    const coaches = await Coach.find({ status: 'Verified' });
-    const academies = await Academy.find({ status: 'Verified' });
-    const districts = await District.find({ status: 'Verified' });
-    return { players, coaches, academies, districts };
+  const players = await Player.find({ status: "Verified" });
+  const coaches = await Coach.find({ status: "Verified" });
+  const academies = await Academy.find({ status: "Verified" });
+  const districts = await District.find({ status: "Verified" });
+  return { players, coaches, academies, districts };
 };
 
 const deleteMember = async (memberId, memberType) => {
-    let Model;
-    switch (memberType) {
-        case 'Player':
-            Model = Player;
-            break;
-        case 'Coach':
-            Model = Coach;
-            break;
-        case 'Academy':
-            Model = Academy;
-            break;
-        case 'District':
-            Model = District;
-            break;
-        default:
-            throw new Error('Invalid member type');
-    }
-    const member = await Model.findByIdAndDelete(memberId);
-    if (!member) {
-        throw new Error('Member not found');
-    }
-    return member;
+  let Model;
+  switch (memberType) {
+    case "Player":
+      Model = Player;
+      break;
+    case "Coach":
+      Model = Coach;
+      break;
+    case "Academy":
+      Model = Academy;
+      break;
+    case "District":
+      Model = District;
+      break;
+    default:
+      throw new Error("Invalid member type");
+  }
+  const member = await Model.findByIdAndDelete(memberId);
+  if (!member) {
+    throw new Error("Member not found");
+  }
+  return member;
 };
 
 const removeMember = async (memberId, memberType) => {
-    let Model;
-    switch (memberType) {
-        case 'Player':
-            Model = Player;
-            break;
-        case 'Coach':
-            Model = Coach;
-            break;
-        case 'Academy':
-            Model = Academy;
-            break;
-        case 'District':
-            Model = District;
-            break;
-        default:
-            throw new Error('Invalid member type');
-    }
-    const member = await Model.findByIdAndUpdate(
-        memberId,
-        { status: 'Removed' },
-        { new: true }
-    );
-    if (!member) {
-        throw new Error('Member not found');
-    }
-    return member;
+  let Model;
+  switch (memberType) {
+    case "Player":
+      Model = Player;
+      break;
+    case "Coach":
+      Model = Coach;
+      break;
+    case "Academy":
+      Model = Academy;
+      break;
+    case "District":
+      Model = District;
+      break;
+    default:
+      throw new Error("Invalid member type");
+  }
+  const member = await Model.findByIdAndUpdate(
+    memberId,
+    { status: "Removed" },
+    { new: true },
+  );
+  if (!member) {
+    throw new Error("Member not found");
+  }
+  return member;
 };
 
-module.exports = { Register, Login, getMemberDetails, getAllMembers, approveMember, getPendingMembers, getVerifiedMembers, deleteMember, removeMember };
+module.exports = {
+  Register,
+  Login,
+  getMemberDetails,
+  getAllMembers,
+  approveMember,
+  getPendingMembers,
+  getVerifiedMembers,
+  deleteMember,
+  removeMember,
+};

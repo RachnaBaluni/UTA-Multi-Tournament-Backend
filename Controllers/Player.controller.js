@@ -47,14 +47,27 @@ const loginPlayer = async (req, res) => {
       password,
     });
 
-    const token = jwt.sign({ id: data.id }, "secretkey123", {
-      expiresIn: "7d",
-    });
+    const token = jwt.sign(
+      {
+        id: data.id,
+        playerType: data.playerType,
+      },
+      "secretkey123",
+      {
+        expiresIn: "7d",
+      },
+    );
 
     res.status(200).json({
       success: true,
       message: `Welcome ${data.name}`,
-      data: data,
+      data: {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        playerType: data.playerType,
+        user: data.user,
+      },
       token,
     });
   } catch (error) {
@@ -66,7 +79,6 @@ const loginPlayer = async (req, res) => {
     });
   }
 };
-
 const getLoggedInPlayer = async (req, res) => {
   try {
     const id = req.params.id;

@@ -1,4 +1,5 @@
 const Player = require("../models/Player.model.js");
+const MemberPlayer = require("../models/MemberPlayer.model.js");
 const bcrypt = require("bcrypt");
 const Team = require("../models/Team.model.js");
 const Event = require("../models/Event.model.js");
@@ -250,23 +251,50 @@ const loginPlayer = async (data) => {
     throw new Error("Both Email and Password are Required");
   }
 
-  const player = await Player.findOne({ email });
+  // 🔹 1. Pehle Normal Player DB check karo
+  let player = await Player.findOne({ email });
 
-  if (!player) {
-    throw new Error("This Email is not Registered");
+  if (player) {
+    const isPasswordCorrect = await bcrypt.compare(password, player.password);
+
+    if (!isPasswordCorrect) {
+      throw new Error("Incorrect Password");
+    }
+
+    return {
+      id: player._id,
+      name: player.name,
+      email: player.email,
+      playerType: "NormalPlayer",
+      user: player,
+    };
   }
 
-  const isPasswordCorrect = await bcrypt.compare(password, player.password);
+  // 🔹 2. Normal Player mein nahi mila
+  //    to MemberPlayer DB check karo
+  const memberPlayer = await MemberPlayer.findOne({ email });
 
-  if (!isPasswordCorrect) {
-    throw new Error("Incorrect Password");
+  if (memberPlayer) {
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      memberPlayer.password,
+    );
+
+    if (!isPasswordCorrect) {
+      throw new Error("Incorrect Password");
+    }
+
+    return {
+      id: memberPlayer._id,
+      name: memberPlayer.name,
+      email: memberPlayer.email,
+      playerType: "MemberPlayer",
+      user: memberPlayer,
+    };
   }
 
-  return {
-    id: player._id,
-    name: player.name,
-    email: player.email,
-  };
+  // 🔹 Dono DB mein email nahi mila
+  throw new Error("This Email is not Registered");
 };
 const updatePlayer = async (id, data) => {
   const player = await Player.findById(id);
