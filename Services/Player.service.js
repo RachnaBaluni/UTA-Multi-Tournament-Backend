@@ -247,15 +247,19 @@ const RegisterPlayer = async (data) => {
 const loginPlayer = async (data) => {
   const { email, password } = data;
 
+  console.log("🔥 LOGIN HIT");
+  console.log("🔥 EMAIL:", email);
   if (!email || !password) {
     throw new Error("Both Email and Password are Required");
   }
 
   // 🔹 1. Pehle Normal Player DB check karo
   let player = await Player.findOne({ email });
+  console.log("🔥 NORMAL PLAYER:", player ? "FOUND" : "NOT FOUND");
 
   if (player) {
     const isPasswordCorrect = await bcrypt.compare(password, player.password);
+    console.log("🔥 NORMAL PASSWORD:", isPasswordCorrect);
 
     if (!isPasswordCorrect) {
       throw new Error("Incorrect Password");
@@ -273,12 +277,14 @@ const loginPlayer = async (data) => {
   // 🔹 2. Normal Player mein nahi mila
   //    to MemberPlayer DB check karo
   const memberPlayer = await MemberPlayer.findOne({ email });
+  console.log("🔥 MEMBER PLAYER:", memberPlayer ? "FOUND" : "NOT FOUND");
 
   if (memberPlayer) {
     const isPasswordCorrect = await bcrypt.compare(
       password,
       memberPlayer.password,
     );
+    console.log("🔥 MEMBER PASSWORD:", isPasswordCorrect);
 
     if (!isPasswordCorrect) {
       throw new Error("Incorrect Password");
