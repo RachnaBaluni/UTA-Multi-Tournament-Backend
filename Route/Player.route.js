@@ -16,6 +16,10 @@ router.get(
 );
 router.post("/register/", PlayerController.RegisterPlayer);
 router.post("/login", PlayerController.loginPlayer);
+router.get(
+  "/tournament-registrations/:playerId",
+  PlayerController.getMyTournamentRegistrations,
+);
 router.get("/:id", PlayerController.getLoggedInPlayer);
 router.post("/:id/updatePlayer", PlayerController.updatePlayer);
 router.post("/:id/updateTeams", PlayerController.updateTeams);

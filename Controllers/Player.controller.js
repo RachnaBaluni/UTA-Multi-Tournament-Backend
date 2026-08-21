@@ -206,6 +206,26 @@ const getPlayerJourney = async (req, res) => {
     });
   }
 };
+const getMyTournamentRegistrations = async (req, res) => {
+  try {
+    const playerId = req.params.playerId;
+
+    const registrations =
+      await PlayerService.getPlayerTournamentRegistrations(playerId);
+
+    res.status(200).json({
+      success: true,
+      data: registrations,
+    });
+  } catch (error) {
+    console.error("GET PLAYER TOURNAMENT REGISTRATIONS ERROR:", error);
+
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 module.exports = {
   RegisterPlayer,
@@ -219,4 +239,5 @@ module.exports = {
   deletePlayer,
   getPlayersWithDetailsFrontend,
   getPlayerJourney,
+  getMyTournamentRegistrations,
 };

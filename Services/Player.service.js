@@ -1,5 +1,7 @@
 const Player = require("../models/Player.model.js");
 const MemberPlayer = require("../models/MemberPlayer.model.js");
+
+const TournamentRegistration = require("../models/TournamentRegistration.model.js");
 const bcrypt = require("bcrypt");
 const Team = require("../models/Team.model.js");
 const Event = require("../models/Event.model.js");
@@ -41,7 +43,7 @@ const RegisterPlayer = async (data) => {
   const requiredFields = ["name", "whatsappNumber", "dob", "city"];
 
   if (registrationFields.shirtSize) {
-    requiredFields.push("shirtSize", "shortSize");
+    requiredFields.push("shirtSize");
   }
 
   if (registrationFields.foodPreference) {
@@ -77,23 +79,6 @@ const RegisterPlayer = async (data) => {
     city: data.city,
     email: data.email,
     password: hashedPassword,
-    ...(registrationFields.shirtSize && {
-      shirtSize: data.shirtSize,
-      shortSize: data.shortSize,
-    }),
-
-    ...(registrationFields.foodPreference && {
-      foodPref: data.foodPref,
-    }),
-
-    ...(registrationFields.accommodation && {
-      stay: data.stay,
-    }),
-
-    ...(registrationFields.feePaid && {
-      feePaid: data.feePaid,
-      transactionDetails: data.feePaid ? data.transactionDetails : "",
-    }),
   };
 
   if (playerData.feePaid && !playerData.transactionDetails?.trim()) {
@@ -113,9 +98,9 @@ const RegisterPlayer = async (data) => {
       throw new Error("Shirt Size Option is not correct.");
     }
 
-    if (!SHIRT_SIZES.includes(playerData.shortSize)) {
-      throw new Error("Short Size Option is not correct.");
-    }
+    // if (!SHIRT_SIZES.includes(playerData.shortSize)) {
+    //   throw new Error("Short Size Option is not correct.");
+    // }
   }
 
   console.log("Food Pref Received:", playerData.foodPref);
@@ -203,6 +188,27 @@ const RegisterPlayer = async (data) => {
   }
 
   const registerPlayer = await Player.create(playerData);
+  await TournamentRegistration.create({
+    playerId: registerPlayer._id,
+    tournamentId: Tournament1._id,
+
+    ...(registrationFields.shirtSize && {
+      shirtSize: data.shirtSize,
+    }),
+
+    ...(registrationFields.foodPreference && {
+      foodPref: data.foodPref,
+    }),
+
+    ...(registrationFields.accommodation && {
+      accommodation: data.stay,
+    }),
+
+    ...(registrationFields.feePaid && {
+      feePaid: data.feePaid,
+      transactionDetails: data.feePaid ? data.transactionDetails : "",
+    }),
+  });
   if (!registerPlayer) {
     throw new Error("Failed to register player.");
   }
@@ -964,7 +970,7 @@ const getPlayersWithDetails = async () => {
     const teams = await Team.find({
       $or: [{ partner1: player._id }, { partner2: player._id }],
     })
-      .populate("eventId", "name")
+      .populate("eventId", "name date rules showing registrationFields")
       .populate("partner1", "name")
       .populate("partner2", "name");
 
@@ -1035,7 +1041,16 @@ const getPlayersWithDetailsFrontend = async (tournamentId) => {
   const players = await Player.find({
     _id: { $in: playerIds },
   }).lean();
+  const registrations = await TournamentRegistration.find({
+    playerId: { $in: playerIds },
+    tournamentId,
+  }).lean();
 
+  const registrationByPlayer = {};
+
+  for (const registration of registrations) {
+    registrationByPlayer[registration.playerId.toString()] = registration;
+  }
   // 5. Build final player list
   const finalPlayersList = [];
 
@@ -1069,7 +1084,7 @@ const getPlayersWithDetailsFrontend = async (tournamentId) => {
           ? t.partner2?.name || "N/A"
           : t.partner1?.name || "N/A";
     }
-
+    const registration = registrationByPlayer[pId];
     finalPlayersList.push({
       _id: player._id,
       name: player.name,
@@ -1085,7 +1100,6 @@ const getPlayersWithDetailsFrontend = async (tournamentId) => {
       city: player.city,
 
       shirtSize: player.shirtSize,
-      shortSize: player.shortSize,
       foodPref: player.foodPref,
       stay: player.stay,
 
@@ -1214,7 +1228,99 @@ const getPlayerJourney = async (playerId) => {
     throw error;
   }
 };
+const getPlayerTournamentRegistrations = async (playerId) => {
+  const registrations = await TournamentRegistration.find({
+    playerId,
+  })
+    .populate(
+      "tournamentId",
+      "name startDate endDate status registrationFields",
+    )
+    .lean();
 
+  const result = [];
+
+  for (const registration of registrations) {
+    const tournament = registration.tournamentId;
+
+    if (!tournament) {
+      continue;
+    }
+
+    // Tournament  events
+    const events = await Event.find({
+      tournamentId: tournament._id,
+    })
+      .select("_id name date rules showing registrationFields")
+      .lean();
+
+    const eventIds = events.map((event) => event._id);
+
+    // Player ki teams sirf isi tournament ke events mein
+    const teams = await Team.find({
+      eventId: { $in: eventIds },
+      $or: [{ partner1: playerId }, { partner2: playerId }],
+    })
+      .populate("eventId", "name date rules showing registrationFields")
+      .populate("partner1", "name")
+      .populate("partner2", "name")
+      .lean();
+
+    const playerEvents = teams.map((team) => {
+      const isPartner1 = team.partner1?._id?.toString() === playerId.toString();
+
+      const partner = isPartner1 ? team.partner2 : team.partner1;
+
+      return {
+        teamId: team._id,
+
+        eventId: team.eventId?._id,
+
+        eventName: team.eventId?.name || "-",
+
+        eventDate: team.eventId?.date || null,
+
+        eventRules: team.eventId?.rules || [],
+
+        eventShowing: team.eventId?.showing ?? true,
+
+        eventRegistrationFields: team.eventId?.registrationFields || {},
+
+        partner: partner
+          ? {
+              _id: partner._id,
+              name: partner.name,
+            }
+          : null,
+      };
+    });
+
+    result.push({
+      _id: registration._id,
+
+      tournament: {
+        _id: tournament._id,
+        name: tournament.name,
+        startDate: tournament.startDate,
+        endDate: tournament.endDate,
+        status: tournament.status,
+      },
+
+      events: playerEvents,
+
+      // Tournament-level details
+      registrationFields: tournament.registrationFields || {},
+
+      shirtSize: registration.shirtSize,
+      foodPref: registration.foodPref,
+      accommodation: registration.accommodation,
+      feePaid: registration.feePaid,
+      transactionDetails: registration.transactionDetails,
+    });
+  }
+
+  return result;
+};
 module.exports = {
   RegisterPlayer,
   loginPlayer,
@@ -1225,4 +1331,5 @@ module.exports = {
   deletePlayerAndHandleTeams,
   getPlayersWithDetailsFrontend,
   getPlayerJourney,
+  getPlayerTournamentRegistrations,
 };
