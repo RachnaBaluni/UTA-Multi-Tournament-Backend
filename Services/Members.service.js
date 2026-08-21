@@ -428,6 +428,11 @@ const Login = async (data) => {
           let user = await NormalPlayer.findOne({
             email: identifier,
           });
+          console.log("NORMAL PLAYER CHECK 👉", {
+            identifier,
+            userFound: !!user,
+            email: user?.email,
+          });
 
           if (user) {
             const isPasswordValid = await bcrypt.compare(
