@@ -1,4 +1,5 @@
 const Player = require("../models/Player.model.js");
+const bcrypt = require("bcrypt");
 const Team = require("../models/Team.model.js");
 const Event = require("../models/Event.model.js");
 const Nissan_Draws = require("../models/Nissan_Draws.model.js");
@@ -66,12 +67,15 @@ const RegisterPlayer = async (data) => {
     }
   }
 
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+
   const playerData = {
     name: data.name,
     whatsappNumber: data.whatsappNumber,
     dob: data.dob,
     city: data.city,
-
+    email: data.email,
+    password: hashedPassword,
     ...(registrationFields.shirtSize && {
       shirtSize: data.shirtSize,
       shortSize: data.shortSize,
@@ -240,22 +244,30 @@ const RegisterPlayer = async (data) => {
 };
 
 const loginPlayer = async (data) => {
-  const { whatsappNumber, dob } = data;
-  if (!whatsappNumber || !dob)
-    throw new Error("Both Whatsapp Number and Date of Birth are Required");
+  const { email, password } = data;
 
-  const player = await Player.findOne({ whatsappNumber });
-  if (!player) throw new Error("This Whatsapp Number is not Registered");
+  if (!email || !password) {
+    throw new Error("Both Email and Password are Required");
+  }
 
-  if (
-    new Date(dob).toISOString().slice(0, 10) !==
-    player.dob.toISOString().slice(0, 10)
-  )
-    throw new Error("Date of Birth is not Correct");
+  const player = await Player.findOne({ email });
 
-  return { id: player._id, name: player.name };
+  if (!player) {
+    throw new Error("This Email is not Registered");
+  }
+
+  const isPasswordCorrect = await bcrypt.compare(password, player.password);
+
+  if (!isPasswordCorrect) {
+    throw new Error("Incorrect Password");
+  }
+
+  return {
+    id: player._id,
+    name: player.name,
+    email: player.email,
+  };
 };
-
 const updatePlayer = async (id, data) => {
   const player = await Player.findById(id);
 
@@ -268,6 +280,8 @@ const updatePlayer = async (id, data) => {
   const requiredFields = [
     "name",
     "whatsappNumber",
+    "email",
+    "password",
     "dob",
     "city",
     "shirtSize",
