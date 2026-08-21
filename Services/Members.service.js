@@ -1,4 +1,5 @@
 const Player = require("../models/MemberPlayer.model.js");
+const NormalPlayer = require("../models/Player.model.js");
 const Coach = require("../models/MemberCoach.model.js");
 const Academy = require("../models/MemberAcademy.model.js");
 const District = require("../models/MemberDistrict.model.js"); // Import District model
@@ -422,9 +423,53 @@ const Login = async (data) => {
     // Determine which Mongoose model to use and what fields to query
     switch (type) {
       case "Player":
-        Model = Player;
-        queryField1 = "email";
-        queryField2 = "number";
+        {
+          // Pehle normal Player collection check hoga
+          let user = await NormalPlayer.findOne({
+            email: identifier,
+          });
+
+          if (user) {
+            const isPasswordValid = await bcrypt.compare(
+              password,
+              user.password,
+            );
+
+            if (!isPasswordValid) {
+              const error = new Error("Invalid credentials.");
+              error.statusCode = 401;
+              throw error;
+            }
+
+            const userResponse = user.toObject();
+            delete userResponse.password;
+
+            const token = jwt.sign(
+              {
+                id: user._id,
+                type: "Player",
+                playerType: "NormalPlayer",
+                identifier: user.email,
+              },
+              process.env.JWT_SECRET,
+              { expiresIn: "1d" },
+            );
+
+            return {
+              success: true,
+              message: "Player logged in successfully!",
+              user: userResponse,
+              token,
+            };
+          }
+
+          // Normal Player nahi mila to MemberPlayer check hoga
+          Model = Player;
+          queryField1 = "email";
+          queryField2 = "number";
+
+          break;
+        }
         break;
       case "Coach":
         Model = Coach;
