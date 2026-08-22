@@ -21,6 +21,15 @@ const playerSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    dob: {
+      type: Date,
+      required: false,
+    },
+
+    city: {
+      type: String,
+      required: false,
+    },
     address: {
       type: String,
       required: true,
@@ -42,7 +51,7 @@ const playerSchema = new mongoose.Schema(
       default: "UnVerified",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Player = mongoose.model("MemberPlayer", playerSchema);

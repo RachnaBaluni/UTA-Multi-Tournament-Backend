@@ -79,6 +79,13 @@ const RegisterPlayer = async (data) => {
     city: data.city,
     email: data.email,
     password: hashedPassword,
+
+    shirtSize: data.shirtSize,
+    shortSize: data.shortSize,
+    foodPref: data.foodPref,
+    stay: data.stay,
+    feePaid: data.feePaid,
+    transactionDetails: data.transactionDetails,
   };
 
   if (playerData.feePaid && !playerData.transactionDetails?.trim()) {
