@@ -15,12 +15,12 @@ const mainEventSchema = new mongoose.Schema(
       required: true,
     },
     location: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     organizer: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     rules: {
       type: String,
@@ -30,8 +30,13 @@ const mainEventSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    tournamentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tournament",
+      required: true,
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const MainEvent = mongoose.model("MainEvent", mainEventSchema);

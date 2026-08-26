@@ -2,7 +2,16 @@ const MainEvent = require("../models/MainEvent.model.js");
 
 const getMainEvents = async (req, res) => {
   try {
-    const events = await MainEvent.find();
+    const { tournamentId } = req.query;
+
+    const filter = {};
+
+    if (tournamentId) {
+      filter.tournamentId = tournamentId;
+    }
+
+    const events = await MainEvent.find(filter);
+
     res.status(200).json({
       success: true,
       message: "Fetched Main Events Successfully",
@@ -15,7 +24,6 @@ const getMainEvents = async (req, res) => {
     });
   }
 };
-
 const addMainEvent = async (req, res) => {
   try {
     const { name, description, date, location, organizer, rules } = req.body;
@@ -54,7 +62,7 @@ const updateMainEvent = async (req, res) => {
     const event = await MainEvent.findByIdAndUpdate(
       id,
       { name, description, date, location, organizer, rules },
-      { new: true }
+      { new: true },
     );
     if (!event) {
       return res.status(404).json({
