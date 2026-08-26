@@ -30,11 +30,6 @@ const mainEventSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    tournamentId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Tournament",
-      required: true,
-    },
   },
   { timestamps: true },
 );
