@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const tournamentDetailSchema = new mongoose.Schema(
   {
+    tournamentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tournament",
+      required: false,
+    },
     key: {
       type: String,
       required: true,
@@ -23,8 +28,11 @@ const tournamentDetailSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-const TournamentDetail = mongoose.model("TournamentDetail", tournamentDetailSchema);
+const TournamentDetail = mongoose.model(
+  "TournamentDetail",
+  tournamentDetailSchema,
+);
 module.exports = TournamentDetail;
