@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const pricesBenifitSchema = new mongoose.Schema(
   {
+    tournamentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tournament",
+      required: true,
+    },
     key: {
       type: String,
       required: true,
@@ -23,7 +28,7 @@ const pricesBenifitSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const PricesBenifit = mongoose.model("PricesBenifit", pricesBenifitSchema);

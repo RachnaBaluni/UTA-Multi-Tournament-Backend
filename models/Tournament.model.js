@@ -62,6 +62,21 @@ const tournamentSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    // ============================
+    // ENTRY & PARTICIPATION
+    // ============================
+    entryParticipationRules: {
+      type: [String],
+      default: [],
+    },
+
+    registrationStartDate: {
+      type: Date,
+    },
+
+    registrationEndDate: {
+      type: Date,
+    },
 
     // ============================
     // STATUS
@@ -71,7 +86,18 @@ const tournamentSchema = new mongoose.Schema(
       enum: ["Upcoming", "Active", "Completed"],
       default: "Upcoming",
     },
+    registrationStartDate: {
+      type: Date,
+    },
 
+    registrationEndDate: {
+      type: Date,
+    },
+
+    entryParticipationRules: {
+      type: [String],
+      default: [],
+    },
     // ============================
     // REGISTRATION FIELDS
     // ============================

@@ -11,6 +11,12 @@ const tournamentDetailSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    title: {
+      type: String,
+      required: false,
+    },
+
     value: {
       type: String,
       required: true,
