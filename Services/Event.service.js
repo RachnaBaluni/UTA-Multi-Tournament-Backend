@@ -2,7 +2,9 @@ const Event = require("../models/Event.model");
 
 exports.getAllEventsService = async (tournamentId) => {
   try {
-    const filter = {};
+    const filter = {
+      showing: true,
+    };
 
     if (tournamentId) {
       filter.tournamentId = tournamentId;
