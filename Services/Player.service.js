@@ -112,13 +112,6 @@ const RegisterPlayer = async (data) => {
     }
   }
 
-  const duplicatePlayer = await Player.findOne({
-    whatsappNumber: playerData.whatsappNumber,
-  });
-  if (duplicatePlayer) {
-    throw new Error("The Whatsapp Number is already Registered.");
-  }
-
   if (!event1 || typeof event1 !== "string" || !event1.trim()) {
     throw new Error("Event 1 cannot be empty.");
   }
@@ -186,8 +179,22 @@ const RegisterPlayer = async (data) => {
       );
     }
   }
+  let registerPlayer = await Player.findOne({
+    whatsappNumber: playerData.whatsappNumber,
+  });
 
-  const registerPlayer = await Player.create(playerData);
+  if (!registerPlayer) {
+    registerPlayer = await Player.create(playerData);
+  }
+
+  const alreadyRegistered = await TournamentRegistration.findOne({
+    playerId: registerPlayer._id,
+    tournamentId: Tournament1._id,
+  });
+
+  if (alreadyRegistered) {
+    throw new Error("You are already registered in this tournament.");
+  }
   await TournamentRegistration.create({
     playerId: registerPlayer._id,
     tournamentId: Tournament1._id,
