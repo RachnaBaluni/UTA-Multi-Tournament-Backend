@@ -1,12 +1,22 @@
-const venueService = require('../Services/Venue.service');
+const venueService = require("../Services/Venue.service");
 
 const getAllVenue = async (req, res) => {
-    try {
-        const events = await venueService.getAllVenueService();
-        res.status(200).json({ success: true, data: events });
-    } catch (error) {
-        res.status(500).json({ success: false, message: 'Error fetching events.', error: error.message });
-    }
+  try {
+    const { tournamentId } = req.query;
+
+    const venues = await venueService.getAllVenueService(tournamentId);
+
+    res.status(200).json({
+      success: true,
+      data: venues,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error fetching venue.",
+      error: error.message,
+    });
+  }
 };
 
-module.exports = { getAllVenue};
+module.exports = { getAllVenue };

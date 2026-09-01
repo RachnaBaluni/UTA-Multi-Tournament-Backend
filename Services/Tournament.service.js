@@ -1,5 +1,6 @@
 const Tournament = require("../models/Tournament.model");
-
+const TournamentDetail = require("../models/TournamentDetail.model");
+const PricesBenifit = require("../models/PricesBenifit.model");
 exports.getAllTournamentsService = async () => {
   try {
     return await Tournament.find().sort({ startDate: "desc" });

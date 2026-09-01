@@ -98,6 +98,74 @@ const tournamentSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+
+    // ============================
+    // TOURNAMENT DETAILS
+    // ============================
+    tournamentDetails: [
+      {
+        key: {
+          type: String,
+          required: true,
+        },
+
+        title: {
+          type: String,
+        },
+
+        value: {
+          type: String,
+          required: true,
+        },
+
+        date: {
+          type: Date,
+          required: true,
+        },
+
+        rules: {
+          type: [String],
+          default: [],
+        },
+
+        showing: {
+          type: Boolean,
+          default: true,
+        },
+      },
+    ],
+
+    // ============================
+    // PRIZES & BENEFITS
+    // ============================
+    prizesBenefits: [
+      {
+        key: {
+          type: String,
+          required: true,
+        },
+
+        value: {
+          type: String,
+          required: true,
+        },
+
+        date: {
+          type: Date,
+          required: true,
+        },
+
+        rules: {
+          type: [String],
+          default: [],
+        },
+
+        showing: {
+          type: Boolean,
+          default: true,
+        },
+      },
+    ],
     // ============================
     // REGISTRATION FIELDS
     // ============================

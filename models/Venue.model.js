@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const venueSchema = new mongoose.Schema(
   {
+    tournamentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tournament",
+      required: true,
+    },
     key: {
       type: String,
       required: true,
@@ -23,7 +28,7 @@ const venueSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Venue = mongoose.model("Venue", venueSchema);
