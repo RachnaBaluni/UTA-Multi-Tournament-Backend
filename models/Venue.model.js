@@ -27,6 +27,10 @@ const venueSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    mapLink: {
+      type: String,
+      default: "",
+    },
   },
   { timestamps: true },
 );
