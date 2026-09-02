@@ -315,7 +315,7 @@ const loginPlayer = async (data) => {
   // 🔹 Dono DB mein email nahi mila
   throw new Error("This Email is not Registered");
 };
-const updatePlayer = async (id, data) => {
+const updatePlayer = async (id, data, tournamentId) => {
   const player = await Player.findById(id);
 
   if (!player) {
@@ -376,16 +376,32 @@ const updatePlayer = async (id, data) => {
     throw new Error("Transaction details are required if fee is paid.");
   }
 
+  // Update common player details
   player.name = data.name;
   player.whatsappNumber = data.whatsappNumber;
   player.dob = data.dob;
   player.city = data.city;
-  player.shirtSize = data.shirtSize;
-  player.shortSize = data.shortSize;
-  player.foodPref = data.foodPref;
-  player.stay = data.stay;
-  player.feePaid = data.feePaid;
-  player.transactionDetails = data.feePaid ? data.transactionDetails : "";
+
+  // Update tournament-specific registration details
+  if (tournamentId) {
+    const registration = player.tournamentRegistrations.find(
+      (registration) =>
+        registration.tournamentId?.toString() === tournamentId.toString(),
+    );
+
+    if (!registration) {
+      throw new Error("Tournament registration not found.");
+    }
+
+    registration.shirtSize = data.shirtSize;
+    registration.foodPref = data.foodPref;
+    registration.feePaid = data.feePaid;
+    registration.transactionDetails = data.feePaid
+      ? data.transactionDetails
+      : "";
+
+    registration.stay = data.stay;
+  }
 
   await player.save();
 

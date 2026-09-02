@@ -98,7 +98,11 @@ const getLoggedInPlayer = async (req, res) => {
 
 const updatePlayer = async (req, res) => {
   try {
-    await PlayerService.updatePlayer(req.params.id, req.body.formData);
+    await PlayerService.updatePlayer(
+      req.params.id,
+      req.body.formData,
+      req.body.tournamentId,
+    );
     res.status(200).json({
       success: true,
       message: `Your Personal Details have been updated`,
