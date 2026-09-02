@@ -323,22 +323,17 @@ const updatePlayer = async (id, data, tournamentId) => {
   }
 
   console.log("🔥 UPDATE PLAYER DATA:", JSON.stringify(data, null, 2));
+  console.log("🔥 TOURNAMENT ID:", tournamentId);
 
-  const requiredFields = [
+  const requiredPlayerFields = [
     "name",
     "whatsappNumber",
     "email",
-
     "dob",
     "city",
-    "shirtSize",
-    "shortSize",
-    "foodPref",
-    "feePaid",
-    "stay",
   ];
 
-  for (const field of requiredFields) {
+  for (const field of requiredPlayerFields) {
     if (
       !Object.prototype.hasOwnProperty.call(data, field) ||
       data[field] === undefined ||
@@ -360,22 +355,6 @@ const updatePlayer = async (id, data, tournamentId) => {
     throw new Error("Date Of Birth is not correct.");
   }
 
-  if (!SHIRT_SIZES.includes(data.shirtSize)) {
-    throw new Error("Shirt Size Option is not correct.");
-  }
-
-  if (!SHIRT_SIZES.includes(data.shortSize)) {
-    throw new Error("Short Size Option is not correct.");
-  }
-
-  if (!FOOD_PREFS.includes(data.foodPref)) {
-    throw new Error("Incorrect Food Preference.");
-  }
-
-  if (data.feePaid && !data.transactionDetails?.trim()) {
-    throw new Error("Transaction details are required if fee is paid.");
-  }
-
   // Update common player details
   player.name = data.name;
   player.whatsappNumber = data.whatsappNumber;
@@ -384,23 +363,51 @@ const updatePlayer = async (id, data, tournamentId) => {
 
   // Update tournament-specific registration details
   if (tournamentId) {
-    const registration = player.tournamentRegistrations.find(
-      (registration) =>
-        registration.tournamentId?.toString() === tournamentId.toString(),
-    );
+    const registration = await TournamentRegistration.findOne({
+      playerId: id,
+      tournamentId: tournamentId,
+    });
 
     if (!registration) {
       throw new Error("Tournament registration not found.");
     }
 
-    registration.shirtSize = data.shirtSize;
-    registration.foodPref = data.foodPref;
-    registration.feePaid = data.feePaid;
-    registration.transactionDetails = data.feePaid
-      ? data.transactionDetails
-      : "";
+    if (
+      data.shirtSize !== undefined &&
+      data.shirtSize !== null &&
+      !SHIRT_SIZES.includes(data.shirtSize)
+    ) {
+      throw new Error("Shirt Size Option is not correct.");
+    }
 
-    registration.stay = data.stay;
+    if (
+      data.foodPref !== undefined &&
+      data.foodPref !== null &&
+      !FOOD_PREFS.includes(data.foodPref)
+    ) {
+      throw new Error("Incorrect Food Preference.");
+    }
+
+    if (data.feePaid && !data.transactionDetails?.trim()) {
+      throw new Error("Transaction details are required if fee is paid.");
+    }
+
+    if (data.shirtSize !== undefined) {
+      registration.shirtSize = data.shirtSize;
+    }
+
+    if (data.foodPref !== undefined) {
+      registration.foodPref = data.foodPref;
+    }
+
+    if (data.feePaid !== undefined) {
+      registration.feePaid = data.feePaid;
+      registration.transactionDetails = data.feePaid
+        ? data.transactionDetails || ""
+        : "";
+    }
+
+    await registration.save();
   }
 
   await player.save();
