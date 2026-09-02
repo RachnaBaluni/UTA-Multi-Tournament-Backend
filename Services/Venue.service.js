@@ -19,3 +19,13 @@ exports.createVenueService = async (data) => {
     throw new Error(error.message);
   }
 };
+exports.updateVenueService = async (venueId, data) => {
+  try {
+    return await Venue.findByIdAndUpdate(venueId, data, {
+      new: true,
+      runValidators: true,
+    });
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};

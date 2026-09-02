@@ -3,6 +3,7 @@ const express = require("express");
 const {
   getAllVenue,
   createVenue,
+  updateVenue,
 } = require("../Controllers/Venue.controller.js");
 
 const router = express.Router();
