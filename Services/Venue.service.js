@@ -21,11 +21,29 @@ exports.createVenueService = async (data) => {
 };
 exports.updateVenueService = async (venueId, data) => {
   try {
-    return await Venue.findByIdAndUpdate(venueId, data, {
+    console.log("========== UPDATE VENUE DEBUG ==========");
+    console.log("VENUE ID RECEIVED:", venueId);
+    console.log("VENUE DATA:", data);
+
+    const existingVenue = await Venue.findById(venueId);
+
+    console.log("EXISTING VENUE:", existingVenue);
+
+    if (!existingVenue) {
+      console.log("❌ VENUE NOT FOUND IN DATABASE");
+      return null;
+    }
+
+    const updatedVenue = await Venue.findByIdAndUpdate(venueId, data, {
       new: true,
       runValidators: true,
     });
+
+    console.log("✅ UPDATED VENUE:", updatedVenue);
+
+    return updatedVenue;
   } catch (error) {
+    console.error("❌ UPDATE VENUE ERROR:", error);
     throw new Error(error.message);
   }
 };
