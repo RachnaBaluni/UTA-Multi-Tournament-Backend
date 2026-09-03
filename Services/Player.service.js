@@ -696,8 +696,11 @@ const updateTeams = async (id, data) => {
   const player = await Player.findById(id);
   if (!player) throw new Error("Incorrect Player Id Provided.");
 
-  const { event1, event2, partner1, partner2 } = data;
+  const { event1, event2, partner1, partner2, tournamentId } = data;
 
+  if (!tournamentId) {
+    throw new Error("Tournament ID is required.");
+  }
   // 1. Initial Validations
   if (!event1 || event1.trim() === "") {
     throw new Error("Event 1 cannot be empty.");
@@ -718,6 +721,17 @@ const updateTeams = async (id, data) => {
     if (!Event2Doc) {
       throw new Error("Invalid Id for Event 2.");
     }
+  }
+
+  if (Event1Doc.tournamentId.toString() !== tournamentId.toString()) {
+    throw new Error("Event 1 does not belong to selected tournament.");
+  }
+
+  if (
+    Event2Doc &&
+    Event2Doc.tournamentId.toString() !== tournamentId.toString()
+  ) {
+    throw new Error("Event 2 does not belong to selected tournament.");
   }
 
   let existingPartner1Doc = null;
@@ -746,7 +760,14 @@ const updateTeams = async (id, data) => {
     }
   }
   // --- 2. Fetch Player's Current Teams ---
+  const tournamentEvents = await Event.find({
+    tournamentId,
+  }).select("_id");
+
+  const tournamentEventIds = tournamentEvents.map((event) => event._id);
+
   const playerCurrentTeams = await Team.find({
+    eventId: { $in: tournamentEventIds },
     $or: [{ partner1: id }, { partner2: id }],
   });
 
