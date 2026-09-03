@@ -399,7 +399,9 @@ const updatePlayer = async (id, data, tournamentId) => {
     if (data.foodPref !== undefined) {
       registration.foodPref = data.foodPref;
     }
-
+    if (data.stay !== undefined) {
+      registration.accommodation = data.stay;
+    }
     if (data.feePaid !== undefined) {
       registration.feePaid = data.feePaid;
       registration.transactionDetails = data.feePaid
