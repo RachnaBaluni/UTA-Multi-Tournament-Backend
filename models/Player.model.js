@@ -20,7 +20,11 @@ const tournamentRegistrationSchema = new mongoose.Schema(
       enum: ["Veg", "Non-Veg", "I Won't Be There"],
       required: false,
     },
-
+    stay: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
     feePaid: {
       type: Boolean,
       default: false,
