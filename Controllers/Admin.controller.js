@@ -16,7 +16,10 @@ const adminLogin = (req, res) => {
         path: "/",
         maxAge: 1000 * 60 * 60,
       });
-      res.status(200).json({ message: result.message });
+      res.status(200).json({
+        message: result.message,
+        token,
+      });
     }
   } catch (error) {
     res.status(401).json({ message: error.message });
