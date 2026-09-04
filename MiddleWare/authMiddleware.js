@@ -85,7 +85,16 @@ const authenticateDB = async (req, res, next) => {
  * ADMIN MIDDLEWARE (FIXED)
  */
 const isAdmin = (req, res, next) => {
-  const token = req.cookies?.token;
+  const authHeader = req.headers.authorization;
+
+  const tokenFromHeader = authHeader?.startsWith("Bearer ")
+    ? authHeader.split(" ")[1]
+    : null;
+
+  const token = req.cookies?.token || tokenFromHeader;
+
+  console.log("AUTH HEADER:", authHeader);
+  console.log("TOKEN FOUND:", !!token);
 
   if (!token) {
     return res.status(401).json({
@@ -96,6 +105,8 @@ const isAdmin = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    console.log("DECODED TOKEN:", decoded);
 
     const email = decoded.email;
     const password = decoded.password;
@@ -113,13 +124,14 @@ const isAdmin = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
+    console.error("Admin auth error:", error);
+
     return res.status(401).json({
       success: false,
       message: "Unauthorized: Invalid token",
     });
   }
 };
-
 module.exports = {
   authenticateDB,
   isAdmin,
