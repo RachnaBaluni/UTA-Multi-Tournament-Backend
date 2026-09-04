@@ -10,18 +10,24 @@ const MemberPlayer = require("../models/MemberPlayer.model");
  */
 const authenticateDB = async (req, res, next) => {
   try {
-    const token = req.cookies?.token;
+    const authHeader = req.headers.authorization;
+    const tokenFromHeader = authHeader?.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : null;
+
+    const token = req.cookies?.token || tokenFromHeader;
 
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: "Not authorized, no token provided.",
+        message: "Unauthorized: No token provided",
       });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const { id, type } = decoded;
+    //if id is not talen from tokden onr type is nto done for the whole csyjlshetnm
 
     if (!id || !type) {
       return res.status(401).json({
