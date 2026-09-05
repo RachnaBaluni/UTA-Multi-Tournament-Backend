@@ -24,21 +24,67 @@ const getAllTournamentDetails = async (req, res) => {
 };
 
 // CREATE TOURNAMENT DETAIL
+// CREATE TOURNAMENT DETAILS
 const createTournamentDetail = async (req, res) => {
   try {
-    const detail = await tournamentDetailService.createTournamentDetailService(
-      req.body,
-    );
+    const { tournamentId, details } = req.body;
+
+    if (!tournamentId) {
+      return res.status(400).json({
+        success: false,
+        message: "Tournament ID is required.",
+      });
+    }
+
+    if (!Array.isArray(details) || details.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "At least one tournament detail is required.",
+      });
+    }
+
+    const createdDetails = [];
+
+    for (const detail of details) {
+      if (!detail.key?.trim() || !detail.value?.trim() || !detail.date) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Key, value and date are required for every tournament detail.",
+        });
+      }
+
+      const detailData = {
+        tournamentId,
+        key: detail.key.trim(),
+        value: detail.value.trim(),
+        date: detail.date,
+        rules: detail.rules
+          ? detail.rules
+              .split("\n")
+              .map((rule) => rule.trim())
+              .filter(Boolean)
+          : [],
+        showing: detail.showing !== false,
+      };
+
+      const createdDetail =
+        await tournamentDetailService.createTournamentDetailService(detailData);
+
+      createdDetails.push(createdDetail);
+    }
 
     res.status(201).json({
       success: true,
-      message: "Tournament detail created successfully.",
-      data: detail,
+      message: "Tournament details created successfully.",
+      data: createdDetails,
     });
   } catch (error) {
+    console.error("CREATE TOURNAMENT DETAILS ERROR:", error);
+
     res.status(500).json({
       success: false,
-      message: "Error creating tournament detail.",
+      message: "Error creating tournament details.",
       error: error.message,
     });
   }
