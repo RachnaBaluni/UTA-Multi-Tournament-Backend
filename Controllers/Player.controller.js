@@ -4,7 +4,7 @@ const PlayerService = require("../Services/Player.service.js");
 const Team = require("../models/Team.model.js");
 const Player = require("../models/Player.model.js");
 const MemberPlayer = require("../models/MemberPlayer.model.js");
-
+const TournamentRegistration = require("../models/TournamentRegistration.model.js");
 const getPlayers = async (req, res) => {
   try {
     const players = await Team.find()
