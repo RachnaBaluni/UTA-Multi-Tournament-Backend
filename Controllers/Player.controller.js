@@ -25,7 +25,13 @@ const getPlayers = async (req, res) => {
 };
 const getAllPlayersForAdmin = async (req, res) => {
   try {
-    const normalPlayers = await Player.find().select("-password");
+    // Normal Players
+    const normalPlayers = await Player.find().select("-password").populate({
+      path: "tournamentRegistrations.tournamentId",
+      select: "name type startDate endDate status",
+    });
+
+    // Member Players
     const memberPlayers = await MemberPlayer.find().select("-password");
 
     res.status(200).json({
@@ -42,6 +48,7 @@ const getAllPlayersForAdmin = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error fetching all players",
+      error: error.message,
     });
   }
 };
