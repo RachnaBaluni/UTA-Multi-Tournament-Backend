@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const PlayerService = require("../Services/Player.service.js");
 const Team = require("../models/Team.model.js");
 const Player = require("../models/Player.model.js");
+const MemberPlayer = require("../models/MemberPlayer.model.js");
 
 const getPlayers = async (req, res) => {
   try {
@@ -19,6 +20,28 @@ const getPlayers = async (req, res) => {
     res.status(400).json({
       success: false,
       message: "Error Fetching the Players",
+    });
+  }
+};
+const getAllPlayersForAdmin = async (req, res) => {
+  try {
+    const normalPlayers = await Player.find().select("-password");
+    const memberPlayers = await MemberPlayer.find().select("-password");
+
+    res.status(200).json({
+      success: true,
+      message: "Fetched all players successfully",
+      data: {
+        normalPlayers,
+        memberPlayers,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching all players:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Error fetching all players",
     });
   }
 };
@@ -238,6 +261,7 @@ module.exports = {
   updatePlayer,
   updateTeams,
   getPlayers,
+  getAllPlayersForAdmin,
   getPlayersWithDetails,
   toggleFeeStatus,
   deletePlayer,

@@ -5,11 +5,14 @@ const { isAdmin } = require("../MiddleWare/authMiddleware.js");
 const router = express.Router();
 
 router.get("/", PlayerController.getPlayers);
+
 router.get(
   "/details/:tournamentId",
   isAdmin,
   PlayerController.getPlayersWithDetailsFrontend,
 ); //router.get("/details", isAdmin, PlayerController.getPlayersWithDetails);
+
+router.get("/all-players", isAdmin, PlayerController.getAllPlayersForAdmin);
 router.get(
   "/details-frontend/:tournamentId",
   PlayerController.getPlayersWithDetailsFrontend,
