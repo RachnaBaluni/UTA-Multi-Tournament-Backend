@@ -358,6 +358,7 @@ const updatePlayer = async (id, data, tournamentId) => {
   // Update common player details
   player.name = data.name;
   player.whatsappNumber = data.whatsappNumber;
+  player.email = data.email;
   player.dob = data.dob;
   player.city = data.city;
 
