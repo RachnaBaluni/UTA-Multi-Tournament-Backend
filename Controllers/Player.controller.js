@@ -25,20 +25,81 @@ const getPlayers = async (req, res) => {
 };
 const getAllPlayersForAdmin = async (req, res) => {
   try {
-    // Normal Players
-    const normalPlayers = await Player.find().select("-password").populate({
-      path: "tournamentRegistrations.tournamentId",
-      select: "name type startDate endDate status",
-    });
+    // ============================
+    // 1. Get all normal players
+    // ============================
+    const normalPlayers = await Player.find().select("-password").lean();
 
-    // Member Players
-    const memberPlayers = await MemberPlayer.find().select("-password");
+    // ============================
+    // 2. Get all tournament registrations
+    // ============================
+    const playerIds = normalPlayers.map((player) => player._id);
 
+    const registrations = await TournamentRegistration.find({
+      playerId: { $in: playerIds },
+    })
+      .populate("tournamentId", "name type startDate endDate status")
+      .lean();
+
+    // ============================
+    // 3. Create player -> tournaments map
+    // ============================
+    const tournamentsByPlayer = {};
+
+    for (const registration of registrations) {
+      const playerId = registration.playerId.toString();
+
+      if (!tournamentsByPlayer[playerId]) {
+        tournamentsByPlayer[playerId] = [];
+      }
+
+      if (registration.tournamentId) {
+        tournamentsByPlayer[playerId].push({
+          tournamentId: registration.tournamentId._id,
+          tournamentName: registration.tournamentId.name,
+
+          startDate: registration.tournamentId.startDate,
+          endDate: registration.tournamentId.endDate,
+          status: registration.tournamentId.status,
+
+          shirtSize: registration.shirtSize || "-",
+          foodPref: registration.foodPref || "-",
+          accommodation:
+            registration.accommodation !== undefined
+              ? registration.accommodation
+              : "-",
+
+          feePaid:
+            registration.feePaid !== undefined ? registration.feePaid : false,
+
+          transactionDetails: registration.transactionDetails || "-",
+        });
+      }
+    }
+
+    // ============================
+    // 4. Attach tournaments to players
+    // ============================
+    const finalNormalPlayers = normalPlayers.map((player) => ({
+      ...player,
+
+      tournaments: tournamentsByPlayer[player._id.toString()] || [],
+    }));
+
+    // ============================
+    // 5. Member Players
+    // ============================
+    const memberPlayers = await MemberPlayer.find().select("-password").lean();
+
+    // ============================
+    // 6. Response
+    // ============================
     res.status(200).json({
       success: true,
       message: "Fetched all players successfully",
+
       data: {
-        normalPlayers,
+        normalPlayers: finalNormalPlayers,
         memberPlayers,
       },
     });
